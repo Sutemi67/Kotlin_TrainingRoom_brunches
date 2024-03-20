@@ -3,12 +3,12 @@ import kotlin.random.Random
 class DiceRollerV2 {
 
     // сделайте интерфейс OnRollCallback функциональным
-    interface OnRollCallback {
+    fun interface OnRollCallback {
         fun call(firstDiceValue: Int, secondDiceValue: Int)
     }
 
     // сделайте интерфейс OnDoubleCallback функциональным
-    interface OnDoubleCallback {
+    fun interface OnDoubleCallback {
         fun call(diceValue: Int)
     }
 
@@ -38,5 +38,15 @@ class DiceRollerV2 {
 }
 
 fun main() {
-    // ваш код здесь
+    val diceRollerV2 = DiceRollerV2()
+
+    val rollCallback = DiceRollerV2.OnRollCallback { firstDiceValue, secondDiceValue ->
+        println("На кубиках выпало $firstDiceValue и $secondDiceValue")
+    }
+    val doubleCallback = DiceRollerV2.OnDoubleCallback {diceValue ->
+        println("Ура!!! Дубль на $diceValue-ах! Бросаем ещё раз")
+        diceRollerV2.roll()
+    }
+    diceRollerV2.setCallbacks(rollCallback,doubleCallback)
+    repeat(10){diceRollerV2.roll()}
 }
