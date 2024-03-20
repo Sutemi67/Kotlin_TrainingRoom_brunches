@@ -3,8 +3,28 @@ import java.util.*
 class CoffeeMachine {
     private var scanner = Scanner(System.`in`)
 
-    // Начните написание программы с публичной функции start().
-    // В этот раз мы не даём вам конкретных указаний, как должна быть написана программа.
-    // У вас есть полная свобода действией, главное, что бы программа соответствовала ТЗ.
-    // Удачи!
+    fun start(water: Int, milk: Int, beans: Int) {
+        println("Кофемашина готова к работе")
+        var inputWords = scanner.nextLine()
+        var inputWordsLowercase = inputWords.lowercase()
+        while (true) {
+            println("Введите команду:")
+            when (inputWordsLowercase) {
+                "выключить" -> {
+                    println("До свидания!")
+                    break
+                }
+                "наполнить"->{
+
+                }
+                "статус"->{
+
+                }
+                "кофе"->{
+
+                }
+            }
+        }
+    }
 }
+
