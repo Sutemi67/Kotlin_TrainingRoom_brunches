@@ -59,8 +59,66 @@ class CoffeeMachine {
                                 }
                             }
                         }
+
+                        "эспрессо" -> {
+                            if (water >= Types.ESPRESSO.water && milk >= Types.ESPRESSO.milk && beans >= Types.ESPRESSO.beans) {
+                                water -= Types.ESPRESSO.water
+                                milk -= Types.ESPRESSO.milk
+                                beans -= Types.ESPRESSO.beans
+                                println("${Types.ESPRESSO} готов")
+                            } else {
+                                if (water < Types.ESPRESSO.water) {
+                                    println("Недостаточно воды!")
+                                } else if (milk < Types.ESPRESSO.milk) {
+                                    println("Недостаточно молока!")
+                                } else {
+                                    println("Недостаточно кофе!")
+                                }
+                            }
+                        }
+
+                        "американо" -> {
+                            if (water >= Types.AMERICANO.water && milk >= Types.AMERICANO.milk && beans >= Types.AMERICANO.beans) {
+                                water -= Types.AMERICANO.water
+                                milk -= Types.AMERICANO.milk
+                                beans -= Types.AMERICANO.beans
+                                println("${Types.AMERICANO} готов")
+                            } else {
+                                if (water < Types.AMERICANO.water) {
+                                    println("Недостаточно воды!")
+                                } else if (milk < Types.AMERICANO.milk) {
+                                    println("Недостаточно молока!")
+                                } else {
+                                    println("Недостаточно кофе!")
+                                }
+                            }
+                        }
+
+                        "каппучино" -> {
+                            if (water >= Types.CAPPUCCINO.water && milk >= Types.CAPPUCCINO.milk && beans >= Types.CAPPUCCINO.beans) {
+                                water -= Types.CAPPUCCINO.water
+                                milk -= Types.CAPPUCCINO.milk
+                                beans -= Types.CAPPUCCINO.beans
+                                println("${Types.CAPPUCCINO} готов")
+                            } else {
+                                if (water < Types.CAPPUCCINO.water) {
+                                    println("Недостаточно воды!")
+                                } else if (milk < Types.CAPPUCCINO.milk) {
+                                    println("Недостаточно молока!")
+                                } else {
+                                    println("Недостаточно кофе!")
+                                }
+                            }
+                        }
+
+                        "назад" -> continue
+                        else -> {
+                            println("Рецепт не найден!")
+                            continue
+                        }
                     }
                 }
+
                 else -> {
                     println("Неверная команда.")
                 }
