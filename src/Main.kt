@@ -5,11 +5,11 @@ class CoffeeMachine {
     private var milk: Int = 0
     private var beans: Int = 0
 
-    enum class Types(val water: Int, val milk: Int, val beans: Int) {
-        ESPRESSO(60, 0, 10),
-        AMERICANO(120, 0, 10),
-        CAPPUCCINO(120, 20, 60),
-        LATTE(240, 20, 120)
+    enum class Types(val water: Int, val milk: Int, val beans: Int, val coffeeName:String) {
+        ESPRESSO(60, 0, 10, "эспрессо"),
+        AMERICANO(120, 0, 10, "американо"),
+        CAPPUCCINO(120, 60, 20, "капучино"),
+        LATTE(240, 120, 20, "латте")
     }
 
     private var scanner = Scanner(System.`in`)
@@ -48,7 +48,7 @@ class CoffeeMachine {
                                 water -= Types.LATTE.water
                                 milk -= Types.LATTE.milk
                                 beans -= Types.LATTE.beans
-                                println("${Types.LATTE} готов")
+                                println("${Types.LATTE.coffeeName} готов")
                             } else {
                                 if (water < Types.LATTE.water) {
                                     println("Недостаточно воды!")
@@ -65,7 +65,7 @@ class CoffeeMachine {
                                 water -= Types.ESPRESSO.water
                                 milk -= Types.ESPRESSO.milk
                                 beans -= Types.ESPRESSO.beans
-                                println("${Types.ESPRESSO} готов")
+                                println("${Types.ESPRESSO.coffeeName} готов")
                             } else {
                                 if (water < Types.ESPRESSO.water) {
                                     println("Недостаточно воды!")
@@ -82,7 +82,7 @@ class CoffeeMachine {
                                 water -= Types.AMERICANO.water
                                 milk -= Types.AMERICANO.milk
                                 beans -= Types.AMERICANO.beans
-                                println("${Types.AMERICANO} готов")
+                                println("${Types.AMERICANO.coffeeName} готов")
                             } else {
                                 if (water < Types.AMERICANO.water) {
                                     println("Недостаточно воды!")
@@ -94,12 +94,12 @@ class CoffeeMachine {
                             }
                         }
 
-                        "каппучино" -> {
+                        "капучино" -> {
                             if (water >= Types.CAPPUCCINO.water && milk >= Types.CAPPUCCINO.milk && beans >= Types.CAPPUCCINO.beans) {
                                 water -= Types.CAPPUCCINO.water
                                 milk -= Types.CAPPUCCINO.milk
                                 beans -= Types.CAPPUCCINO.beans
-                                println("${Types.CAPPUCCINO} готов")
+                                println("${Types.CAPPUCCINO.coffeeName} готов")
                             } else {
                                 if (water < Types.CAPPUCCINO.water) {
                                     println("Недостаточно воды!")
@@ -125,9 +125,4 @@ class CoffeeMachine {
             }
         }
     }
-}
-
-fun main() {
-    val coffee = CoffeeMachine()
-    coffee.start()
 }
