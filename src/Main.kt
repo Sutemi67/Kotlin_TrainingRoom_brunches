@@ -1,18 +1,24 @@
-sealed class NetworkError(message: String) {
-    data class ServerError(val requestId: String, val message: String?) :
+sealed class NetworkError(val message: String) {
+    class ServerError(requestId: String, message: String?) :
         NetworkError(message = "Ошибка взаимодействия с сервером для запроса: id = $requestId. Сообщение об ошибке: $message")
 
-    data class NoData(val requestId: String) : NetworkError(message = "Для запроса: id = $requestId нет данных")
-    data class NoInternet(val requestId: String) : NetworkError(message = "Нет подключения к интернету.")
+    class NoData(requestId: String) :
+        NetworkError(message = "Для запроса: id = $requestId нет данных")
+
+    class NoInternet(val requestId: String) :
+        NetworkError(message = "Нет подключения к интернету.")
 }
 
 class ErrorHandler {
 
     fun handleError(error: NetworkError) {
         when (error) {
+            is NetworkError.ServerError -> showErrorMessage(error.message)
             is NetworkError.NoData -> showEmptyContent()
-            is NetworkError.NoInternet -> reloadRequest(error.requestId)
-            is NetworkError.ServerError -> error.message?.let { showErrorMessage(it) }
+            is NetworkError.NoInternet -> {
+                showErrorMessage(error.message)
+                reloadRequest(error.requestId)
+            }
         }
     }
 
@@ -32,10 +38,10 @@ class ErrorHandler {
 class Network {
 
     fun onNetworkError(code: Int?, requestId: String, error: String?): NetworkError {
-        return when (code) {
-            null -> NetworkError.NoInternet(requestId)
-            200 -> NetworkError.NoData(requestId)
-            else -> NetworkError.ServerError(requestId, error)
+        return when (code) { // метод будет вызываться программой всякий раз, когда будет получена ошибка
+            null -> NetworkError.NoInternet(requestId)// возвращать ошибку NoInternet, если code = null
+            200 -> NetworkError.NoData(requestId)// возвращать ошибку NoData, если code = 200
+            else -> NetworkError.ServerError(requestId, error)// возвращать ошибку ServerError во всех остальных случаях
         }
     }
 }
