@@ -1,52 +1,56 @@
-import kotlin.random.Random
+enum class GroupRole(val title: String) {
+    VOCAL("Вокалист"),
+    BASS("Бассист"),
+    SOLO("Соло-гитарист"),
+    DRUMS("Барабанщик")
+}
 
-class DiceRollerV2 {
+abstract class RockMusician {
+    abstract val name: String
+    abstract val role: GroupRole
+}
 
-    // сделайте интерфейс OnRollCallback функциональным
-    fun interface OnRollCallback {
-        fun call(firstDiceValue: Int, secondDiceValue: Int)
-    }
+interface CanSing {
+    fun sing()
+}
 
-    // сделайте интерфейс OnDoubleCallback функциональным
-    fun interface OnDoubleCallback {
-        fun call(diceValue: Int)
-    }
+interface CanPlayGuitar {
+    fun playGuitar()
+}
 
-    private var onRollCallback: OnRollCallback? = null
-    private var onDoubleCallback: OnDoubleCallback? = null
+interface CanPlayDrum {
+    fun playDrum()
+}
 
-    fun setCallbacks(onRollCallback: OnRollCallback, onDoubleCallback: OnDoubleCallback) {
-        this.onRollCallback = onRollCallback
-        this.onDoubleCallback = onDoubleCallback
-    }
-
-    fun roll() {
-        if (onRollCallback == null || onDoubleCallback == null) {
-            println("Вы должны вызвать функцию setCallbacks() прежде чем бросать кубики")
-            return
-        }
-
-        val firstDiceValue = Random.nextInt(1, 7)
-        val secondDiceValue = Random.nextInt(1, 7)
-
-        if (firstDiceValue != secondDiceValue) {
-            onRollCallback?.call(firstDiceValue, secondDiceValue)
-        } else {
-            onDoubleCallback?.call(firstDiceValue)
-        }
+// унаследуйте данный класс от абстрактного класса RockMusician
+// имя музыканта должно был переопределено в конструкторе
+// его роль должна быть задана внутри класса как GroupRole.VOCAL
+// вокалист должен уметь петь - реализуйте интерфейс CanSing. Метод sing() должен выводить текст: "We will, we will rock you"
+class Vocalist(override val name: String) : RockMusician(), CanSing {
+    override val role = GroupRole.VOCAL
+    override fun sing() {
+        println("We will, we will rock you")
     }
 }
 
-fun main() {
-    val diceRollerV2 = DiceRollerV2()
+// унаследуйте данный класс от абстрактного класса RockMusician
+// имя музыканта должно был переопределено в конструкторе
+// поскольку и басс, и соло гитаристы являются гитаристами - их роль, как и имя, передаётся при создании в конструкторе.
+// гитаристы должны уметь играть на гитаре. Реализуйте интерфейс CanPlayGuitar. Метод playGuitar() выводит текст "Играю на гитаре"
+class Guitarist(override val name: String, override val role: GroupRole) : RockMusician(), CanPlayGuitar {
+    override fun playGuitar() {
+        println("Играю на гитаре")
+    }
+}
 
-    val rollCallback = DiceRollerV2.OnRollCallback { firstDiceValue, secondDiceValue ->
-        println("На кубиках выпало $firstDiceValue и $secondDiceValue")
+// унаследуйте данный класс от абстрактного класса RockMusician
+// имя музыканта должно был переопределено в конструкторе
+// его роль должна быть задана внутри класса как GroupRole.DRUMS
+// барабанщик играет на ударных. Интерфейс CanPlayDrum поможет в этом, реализуйте его. Метод playDrum() выводит текст "Пам парам пам пам, я играю на барабанах"
+class Drummer(override val name: String) : RockMusician(), CanPlayDrum {
+    override val role: GroupRole
+        get() = GroupRole.DRUMS
+    override fun playDrum() {
+        println("Пам парам пам пам, я играю на барабанах")
     }
-    val doubleCallback = DiceRollerV2.OnDoubleCallback {diceValue ->
-        println("Ура!!! Дубль на $diceValue-ах! Бросаем ещё раз")
-        diceRollerV2.roll()
-    }
-    diceRollerV2.setCallbacks(rollCallback,doubleCallback)
-    repeat(10){diceRollerV2.roll()}
 }
