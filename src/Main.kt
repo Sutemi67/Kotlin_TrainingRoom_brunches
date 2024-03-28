@@ -1,56 +1,41 @@
-enum class GroupRole(val title: String) {
-    VOCAL("Вокалист"),
-    BASS("Бассист"),
-    SOLO("Соло-гитарист"),
-    DRUMS("Барабанщик")
+sealed class NetworkError(message: String) {
+    data class ServerError(val requestId: String, val message: String?) :
+        NetworkError(message = "Ошибка взаимодействия с сервером для запроса: id = $requestId. Сообщение об ошибке: $message")
+
+    data class NoData(val requestId: String) : NetworkError(message = "Для запроса: id = $requestId нет данных")
+    data class NoInternet(val requestId: String) : NetworkError(message = "Нет подключения к интернету.")
 }
 
-abstract class RockMusician {
-    abstract val name: String
-    abstract val role: GroupRole
-}
+class ErrorHandler {
 
-interface CanSing {
-    fun sing()
-}
+    fun handleError(error: NetworkError) {
+        when (error) {
+            is NetworkError.NoData -> showEmptyContent()
+            is NetworkError.NoInternet -> reloadRequest(error.requestId)
+            is NetworkError.ServerError -> error.message?.let { showErrorMessage(it) }
+        }
+    }
 
-interface CanPlayGuitar {
-    fun playGuitar()
-}
+    private fun showErrorMessage(message: String) {
+        println(message)
+    }
 
-interface CanPlayDrum {
-    fun playDrum()
-}
+    private fun showEmptyContent() {
+        println("Показываем пустой экран")
+    }
 
-// унаследуйте данный класс от абстрактного класса RockMusician
-// имя музыканта должно был переопределено в конструкторе
-// его роль должна быть задана внутри класса как GroupRole.VOCAL
-// вокалист должен уметь петь - реализуйте интерфейс CanSing. Метод sing() должен выводить текст: "We will, we will rock you"
-class Vocalist(override val name: String) : RockMusician(), CanSing {
-    override val role = GroupRole.VOCAL
-    override fun sing() {
-        println("We will, we will rock you")
+    private fun reloadRequest(requestId: String) {
+        println("При появлении подключения к интернету перезапускаем запрос: id = $requestId")
     }
 }
 
-// унаследуйте данный класс от абстрактного класса RockMusician
-// имя музыканта должно был переопределено в конструкторе
-// поскольку и басс, и соло гитаристы являются гитаристами - их роль, как и имя, передаётся при создании в конструкторе.
-// гитаристы должны уметь играть на гитаре. Реализуйте интерфейс CanPlayGuitar. Метод playGuitar() выводит текст "Играю на гитаре"
-class Guitarist(override val name: String, override val role: GroupRole) : RockMusician(), CanPlayGuitar {
-    override fun playGuitar() {
-        println("Играю на гитаре")
-    }
-}
+class Network {
 
-// унаследуйте данный класс от абстрактного класса RockMusician
-// имя музыканта должно был переопределено в конструкторе
-// его роль должна быть задана внутри класса как GroupRole.DRUMS
-// барабанщик играет на ударных. Интерфейс CanPlayDrum поможет в этом, реализуйте его. Метод playDrum() выводит текст "Пам парам пам пам, я играю на барабанах"
-class Drummer(override val name: String) : RockMusician(), CanPlayDrum {
-    override val role: GroupRole
-        get() = GroupRole.DRUMS
-    override fun playDrum() {
-        println("Пам парам пам пам, я играю на барабанах")
+    fun onNetworkError(code: Int?, requestId: String, error: String?): NetworkError {
+        return when (code) {
+            null -> NetworkError.NoInternet(requestId)
+            200 -> NetworkError.NoData(requestId)
+            else -> NetworkError.ServerError(requestId, error)
+        }
     }
 }
