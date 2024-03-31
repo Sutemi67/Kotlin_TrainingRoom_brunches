@@ -1,47 +1,24 @@
-sealed class NetworkError(val message: String) {
-    class ServerError(requestId: String, message: String?) :
-        NetworkError(message = "Ошибка взаимодействия с сервером для запроса: id = $requestId. Сообщение об ошибке: $message")
+import kotlin.math.abs
+/*
+В игру надо добавить двух или больше игроков. После чего для каждого игрока будет создаваться случайная карточка с числами. Карточка будет представлять собой сетку в 3 ряда по 5 чисел в каждом.
+После создания всех персонажей игра будет случайно выбрасывать числа от 1 до 99 и вычёркивать их из карточки каждого игрока.
+Побеждает тот игрок, у которого первым будет зачёркнута хотя бы одна линия. Победителей может быть больше одного.
+Разделим задачу на 3 подзадачи.
+В первой задаче нужно создать 2 класса:
+- класс Card — довольно простой класс, который в себе хранит только одно поле numbersсо списком чисел в ряду по ключу (номеру ряда).
+- класс Person имеет 2 поля:
+    - name — имя игрока. Передаётся при создании в конструкторе.
+    - card — карточка игрока. Генерируется новая карточка при создании конструктора.
+*/
 
-    class NoData(requestId: String) :
-        NetworkError(message = "Для запроса: id = $requestId нет данных")
+// создайте класс Card, который содержит в конструкторе одно поле numbers
+// поле numbers — это Map, в которой в качестве ключа номер ряда (1 - 3), а в качестве значения набор чисел
+// набор чисел должен уметь хранить только уникальные значения и в процессе работы программы должен уметь удалять из себя числа
+// подумайте, какая структура данных лучше всего подойдёт для этой цели
 
-    class NoInternet(val requestId: String) :
-        NetworkError(message = "Нет подключения к интернету.")
-}
+// создайте класс Person, который имеет лишь одно поле в конструкторе — строку name
+// в теле класса создайте поле card класса Card. При создании экземпляра класса оно должно генерироваться с помощью метода createCard()
 
-class ErrorHandler {
-
-    fun handleError(error: NetworkError) {
-        when (error) {
-            is NetworkError.ServerError -> showErrorMessage(error.message)
-            is NetworkError.NoData -> showEmptyContent()
-            is NetworkError.NoInternet -> {
-                showErrorMessage(error.message)
-                reloadRequest(error.requestId)
-            }
-        }
-    }
-
-    private fun showErrorMessage(message: String) {
-        println(message)
-    }
-
-    private fun showEmptyContent() {
-        println("Показываем пустой экран")
-    }
-
-    private fun reloadRequest(requestId: String) {
-        println("При появлении подключения к интернету перезапускаем запрос: id = $requestId")
-    }
-}
-
-class Network {
-
-    fun onNetworkError(code: Int?, requestId: String, error: String?): NetworkError {
-        return when (code) { // метод будет вызываться программой всякий раз, когда будет получена ошибка
-            null -> NetworkError.NoInternet(requestId)// возвращать ошибку NoInternet, если code = null
-            200 -> NetworkError.NoData(requestId)// возвращать ошибку NoData, если code = 200
-            else -> NetworkError.ServerError(requestId, error)// возвращать ошибку ServerError во всех остальных случаях
-        }
-    }
-}
+// метод createCard() должен возвращать объект класса Card
+// карточка должна содержать в себе 15 случайных чисел. Числа должны быть распределены в 3 ряда по 5 штук в каждом и не повторяться
+// числа в карточки должны быть от 1 до 99 включительно. Для генерации чисел можно использовать функцию Random.nextInt()
