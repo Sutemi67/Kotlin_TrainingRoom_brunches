@@ -1,70 +1,80 @@
 import kotlin.random.Random
 
-/*
-В игру надо добавить двух или больше игроков. После чего для каждого игрока будет создаваться случайная карточка с числами.
-Карточка будет представлять собой сетку в 3 ряда по 5 чисел в каждом.
-После создания всех персонажей игра будет случайно выбрасывать числа от 1 до 99 и вычёркивать их из карточки каждого игрока.
-Побеждает тот игрок, у которого первым будет зачёркнута хотя бы одна линия. Победителей может быть больше одного.
-Разделим задачу на 3 подзадачи.
-В первой задаче нужно создать 2 класса:
-- класс Card — довольно простой класс, который в себе хранит только одно поле numbers со списком чисел в ряду по ключу (номеру ряда).
-- класс Person имеет 2 поля:
-    - name — имя игрока. Передаётся при создании в конструкторе.
-    - card — карточка игрока. Генерируется новая карточка при создании конструктора.
-*/
+class Lotto {
 
-// создайте класс Card, который содержит в конструкторе одно поле numbers
-// поле numbers — это Map, в которой в качестве ключа номер ряда (1 - 3), а в качестве значения набор чисел
-// набор чисел должен уметь хранить только уникальные значения и в процессе работы программы должен уметь удалять из себя числа
-// подумайте, какая структура данных лучше всего подойдёт для этой цели
-class Card {
-    val numbers: MutableMap<Int, MutableSet<Int>> = mutableMapOf()
+    val persons: MutableList<Person> = mutableListOf()
 
-    init {
-        for (i in 1..3) {
-            numbers[i] = mutableSetOf()
+    // определите поле, в котором будут храниться добавленные игроки `Person`
+    // поле thrownNumbers должно хранить в себе набор выброшенных чисел.
+    val thrownNumbers: MutableSet<Int> = mutableSetOf() // определите подходящую структуру данных
+
+    fun addPerson(person: Person) {
+        // добавить игрока в список игроков
+        persons.add(person)
+    }
+
+    fun start() {
+        // вывести сообщение "Перед началом игры необходимо добавить хотя бы двух игроков" и завершить работу, если количество добавленных игроков меньше 2
+        if (persons.size > 1) {
+            thrownNumbers.add()
+        } else {
+            println("Перед началом игры необходимо добавить хотя бы двух игроков")
+            return
         }
-    }
-
-    fun addNumber(row: Int, number: Int) {
-        numbers[row]?.add(number)
-    }
-
-    fun removeNumber(row: Int, number: Int) {
-        numbers[row]?.remove(number)
-    }
-
-    fun getNumbers(row: Int): Set<Int>? {
-        return numbers[row]
+        // достать номер. Номер может быть в диапазоне от 1 до 99 включительно
+        // после каждого выброшенного числа удалять это число из карточек всех игроков, если такое число имеется
+        // выбрасывать новые числа до тех пор, пока не определится победитель
+        // побеждает тот, у кого в одном из рядов нет больше чисел. Победителей может быть более одного
+        // после того как появляется победитель, для каждого победителя вывести текст "Победитель: [имя_победителя]!!!"
     }
 }
 
-// Создайте класс Person, который имеет лишь одно поле в конструкторе — строку name
-// в теле класса создайте поле card класса Card. При создании экземпляра класса оно должно генерироваться с помощью метода createCard()
-
-// метод createCard() должен возвращать объект класса Card
-// карточка должна содержать в себе 15 случайных чисел. Числа должны быть распределены в 3 ряда по 5 штук в каждом и не повторяться
-// числа в карточки должны быть от 1 до 99 включительно. Для генерации чисел можно использовать
-// функцию Random.nextInt()
+class Card(val numbers: Map<Int, MutableSet<Int>>)
 
 class Person(val name: String) {
+
     val card: Card = createCard()
 
     private fun createCard(): Card {
-        val randomNumbers = mutableSetOf<Int>()
+        val numbers: Set<Int> = generateNumbers()
 
-        while (randomNumbers.size < 15) {
-            val randomNumber = Random.nextInt(1, 100)
-            randomNumbers.add(randomNumber)
-        }
+        val iterator: Iterator<Int> = numbers.iterator()
+        var currentLine = 1
 
-        val rows = randomNumbers.chunked(5)
-        return Card().apply {
-            for ((index, row) in rows.withIndex()) {
-                for (number in row) {
-                    addNumber(index + 1, number)
-                }
+        val cardNumbers: MutableMap<Int, MutableSet<Int>> = mutableMapOf(
+            1 to mutableSetOf(),
+            2 to mutableSetOf(),
+            3 to mutableSetOf()
+        )
+
+        while (iterator.hasNext()) {
+            val number = iterator.next()
+            cardNumbers[currentLine]?.add(number)
+
+            if (currentLine < 3) {
+                currentLine++
+            } else {
+                currentLine = 1
             }
         }
+
+        return Card(cardNumbers)
+    }
+
+    private fun generateNumbers(): Set<Int> {
+        val numbers: MutableSet<Int> = mutableSetOf()
+
+        while (numbers.size < NUMBERS_COUNT) {
+            numbers.add(Random.nextInt(MIN_NUMBER, MAX_NUMBER))
+        }
+
+        return numbers
+    }
+
+    private companion object {
+
+        private const val NUMBERS_COUNT = 15
+        private const val MAX_NUMBER = 100
+        private const val MIN_NUMBER = 1
     }
 }
