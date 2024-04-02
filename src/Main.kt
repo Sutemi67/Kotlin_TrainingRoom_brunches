@@ -2,32 +2,55 @@ import kotlin.random.Random
 
 class Lotto {
 
-    val persons: MutableList<Person> = mutableListOf()
-
-    // определите поле, в котором будут храниться добавленные игроки `Person`
-    // поле thrownNumbers должно хранить в себе набор выброшенных чисел.
-    val thrownNumbers: MutableSet<Int> = mutableSetOf() // определите подходящую структуру данных
+    private val persons: MutableList<Person> = mutableListOf()
+    val thrownNumbers: MutableSet<Int> = mutableSetOf()
 
     fun addPerson(person: Person) {
-        // добавить игрока в список игроков
         persons.add(person)
     }
 
+
     fun start() {
-        // вывести сообщение "Перед началом игры необходимо добавить хотя бы двух игроков" и завершить работу, если количество добавленных игроков меньше 2
         if (persons.size > 1) {
-            thrownNumbers.add()
+            while (true) {
+                val thrownNumber = generateUniqueNumber()
+                thrownNumbers.add(thrownNumber)
+                println("Выброшенное число $thrownNumber")
+
+                for (person in persons) {
+                    val card = person.card
+                    for (line in card.numbers.keys) {
+                        if (thrownNumber in card.numbers[line]!!) {
+                            card.numbers[line]!!.remove(thrownNumber)
+                        }
+                    }
+                }
+
+                val winners = persons.filter { person ->
+                    person.card.numbers.values.all { it.isEmpty() }
+                }
+
+                if (winners.isNotEmpty()) {
+                    for (winner in winners) {
+                        println("Победитель: ${winner.name}!!!")
+                    }
+                    break
+                }
+            }
         } else {
             println("Перед началом игры необходимо добавить хотя бы двух игроков")
-            return
         }
-        // достать номер. Номер может быть в диапазоне от 1 до 99 включительно
-        // после каждого выброшенного числа удалять это число из карточек всех игроков, если такое число имеется
-        // выбрасывать новые числа до тех пор, пока не определится победитель
-        // побеждает тот, у кого в одном из рядов нет больше чисел. Победителей может быть более одного
-        // после того как появляется победитель, для каждого победителя вывести текст "Победитель: [имя_победителя]!!!"
+    }
+
+    private fun generateUniqueNumber(): Int {
+        var number: Int
+        do {
+            number = Random.nextInt(1,100)
+        } while (number in thrownNumbers)
+        return number
     }
 }
+
 
 class Card(val numbers: Map<Int, MutableSet<Int>>)
 
@@ -72,7 +95,6 @@ class Person(val name: String) {
     }
 
     private companion object {
-
         private const val NUMBERS_COUNT = 15
         private const val MAX_NUMBER = 100
         private const val MIN_NUMBER = 1
