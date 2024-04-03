@@ -14,24 +14,22 @@ class Lotto {
             println("Перед началом игры необходимо добавить хотя бы двух игроков")
             return
         } else {
-            val personIterator = persons.iterator()
             while (true) {
                 val thrownNumber = Random.nextInt(1, 100)
+                if (thrownNumbers.contains(thrownNumber)) {
+                    continue
+                }
                 thrownNumbers.add(thrownNumber)
+                println("Выброшенное число: $thrownNumber")
 
-                for (key in 0..personIterator.next().card.numbers.keys.size) {
-
-                    while (personIterator.hasNext()) {
-                        val cardKeys = personIterator.next().card.numbers[key]
-                        val mapIterator = cardKeys!!.iterator()
-
-                        while (mapIterator.hasNext()) {
-                            if (mapIterator.next() == thrownNumber) {
-                                mapIterator.remove()
-                            }
+                for (player in persons) {
+                    val cardNumbers = player.card.numbers
+                    for ((_, set) in cardNumbers) {
+                        if (set.contains(thrownNumber)) {
+                            set.remove(thrownNumber)
                         }
-                        if (cardKeys.size == 0) {
-                            println("Победитель: ${personIterator.next()}!!!")
+                        if (set.isEmpty()) {
+                            println("Победитель: ${player.name}!!!")
                             return
                         }
                     }
