@@ -2,11 +2,12 @@ import kotlin.random.Random
 
 fun main() {
     val catDownloaderV2 = CatDownloaderV2()
-
-    // перепишите данную реализацию согласно требованиям в задаче
-    val downloadedCats = catDownloaderV2.downloadCats(CATS_COUNT)
-    //В новой реализации в выводе такого сообщения необходимости не будет
-    println("Котики $downloadedCats показаны")
+    val downloadedCats = catDownloaderV2.downloadCats(
+        CATS_COUNT,
+        onNext = { showCat(it) },
+        onComplete = { showComplete() },
+        onError = { showError() }
+    )
 }
 
 
@@ -26,20 +27,25 @@ fun showError() {
 const val CATS_COUNT = 5
 
 
-
 class CatDownloaderV2 {
 
-    // перепишите метод согласно заданию. Используйте функции в качестве параметров для реагирования на события загрузки котиков
-    fun downloadCats(count: Int): List<Cat?> {
-        val catsList = mutableListOf<Cat?>()
+    fun downloadCats(
+        count: Int,
+        onNext: (Cat) -> Unit,
+        onComplete: () -> Unit,
+        onError: () -> Unit
+    ) {
         for (i in 1..count) {
-            catsList.add(getCatFromInternet())
+            val cat: Cat? = getCatFromInternet()
+            if (cat != null) {
+                onNext.invoke(cat)
+            } else {
+                onError()
+            }
         }
-
-        return catsList;
+        onComplete()
     }
 
-    // этот метод переписывать не нужно. Но если вам хочется добавить разнообразия — вы можете придумать свою логику генерации котиков ¯\_(ツ)_/¯
     private fun getCatFromInternet(): Cat? {
         return when (Random.nextInt(5)) {
             0 -> null
