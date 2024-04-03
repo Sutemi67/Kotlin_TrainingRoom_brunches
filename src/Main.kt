@@ -1,49 +1,31 @@
+import java.util.*
 import kotlin.random.Random
 
-class Lotto {
-
-    val persons: MutableList<Person> = mutableListOf()
-    val thrownNumbers: MutableSet<Int> = mutableSetOf()
-
-    fun addPerson(person: Person) {
-        persons.add(person)
+class Game {
+    companion object {
+        val input = Scanner(System.`in`)
     }
 
     fun start() {
-        if (persons.size <= 1) {
-            println("Перед началом игры необходимо добавить хотя бы двух игроков")
-            return
-        } else {
-            while (true) {
-                val thrownNumber = Random.nextInt(1, 100)
-                if (thrownNumbers.contains(thrownNumber)) {
-                    continue
-                }
-                thrownNumbers.add(thrownNumber)
-                println("Выброшенное число: $thrownNumber")
+        println("Привет, поиграем в лото?")
+        val lotto = Lotto()
+        while (true) {
+            println("Введите имя нового игрока")
+            val name = input.nextLine()
+            val newPlayer = Person(name)
 
-                for (player in persons) {
-                    val cardNumbers = player.card.numbers
-                    for ((_, set) in cardNumbers) {
-                        if (set.contains(thrownNumber)) {
-                            set.remove(thrownNumber)
-                        }
-                        if (set.isEmpty()) {
-                            println("Победитель: ${player.name}!!!")
-                            return
-                        }
-                    }
+            lotto.addPerson(newPlayer)
+
+            println("Если хотите добавить ещё игрока - введите любой символ, если хотите начать игру введите 'Нет'")
+            when (input.nextLine().lowercase()) {
+                "нет" -> {
+                    break
                 }
             }
         }
+        lotto.start()
     }
 }
-// Достать номер. Номер может быть в диапазоне от 1 до 99 включительно
-// после каждого выброшенного числа удалять это число из карточек всех игроков, если такое число имеется
-// выбрасывать новые числа до тех пор, пока не определится победитель
-// побеждает тот, у кого в одном из рядов нет больше чисел. Победителей может быть более одного
-// после того как появляется победитель, для каждого победителя вывести текст "Победитель: [имя_победителя]!!!"
-
 
 class Card(val numbers: Map<Int, MutableSet<Int>>)
 
@@ -88,8 +70,70 @@ class Person(val name: String) {
     }
 
     private companion object {
+
         private const val NUMBERS_COUNT = 15
         private const val MAX_NUMBER = 100
         private const val MIN_NUMBER = 1
+    }
+}
+
+class Lotto {
+
+    private val persons: MutableList<Person> = mutableListOf()
+    val thrownNumbers: MutableSet<Int> = mutableSetOf()
+
+    fun addPerson(person: Person) {
+        persons.add(person)
+    }
+
+    fun start() {
+        if (persons.size < 2) {
+            println("Перед началом игры необходимо добавить хотя бы двух игроков")
+        } else {
+            do {
+                val number = throwNumber()
+
+                for (person in persons) {
+                    val cardNumbers = person.card.numbers
+                    for (key in cardNumbers.keys) {
+                        cardNumbers[key]?.remove(number)
+                    }
+                }
+            } while (!hasWinners())
+        }
+    }
+
+    private fun throwNumber(): Int {
+        val number = Random.nextInt(1, 100)
+
+        return if (thrownNumbers.contains(number)) {
+            throwNumber()
+        } else {
+            thrownNumbers.add(number)
+            println("Выброшенное число: $number")
+            number
+        }
+    }
+
+    private fun hasWinners(): Boolean {
+        val winners: MutableList<Person> = mutableListOf()
+
+        for (person in persons) {
+            val cardNumbers = person.card.numbers
+            for (key in cardNumbers.keys) {
+                if (cardNumbers[key]?.isEmpty() == true) {
+                    winners.add(person)
+                }
+            }
+        }
+
+        return if (winners.isEmpty()) {
+            false
+        } else {
+            for (winner in winners) {
+                println("Победитель: ${winner.name}!!!")
+            }
+            true
+        }
     }
 }
