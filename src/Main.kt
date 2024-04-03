@@ -1,61 +1,47 @@
 import kotlin.random.Random
 
+
 fun main() {
-    val catDownloaderV2 = CatDownloaderV2()
-    val downloadedCats = catDownloaderV2.downloadCats(
-        CATS_COUNT,
-        onNext = { showCat(it) },
-        onComplete = { showComplete() },
-        onError = { showError() }
+    val catDownloader = CatDownloader()
+
+    catDownloader.downloadCat(
+        onSuccess = { cat -> println("Кот ${cat.name} загружен успешно") },
+        onError = { error -> println(error) },
+        onStart = { println("Загрузчик Котиков начинает работу") },
+        allowErrors = false
     )
 }
 
+class CatDownloader {
 
-fun showCat(cat: Cat) {
-    println("Котик ${cat.name} успешно загружен")
-}
-
-fun showComplete() {
-    println("Загрузка котиков завершена")
-}
-
-fun showError() {
-    println("Упс. При загрузке котика произошла ошибка :(")
-}
-
-// константа для выбора количества загруженных котиков
-const val CATS_COUNT = 5
-
-
-class CatDownloaderV2 {
-
-    fun downloadCats(
-        count: Int,
-        onNext: (Cat) -> Unit,
-        onComplete: () -> Unit,
-        onError: () -> Unit
+    fun downloadCat(
+        onSuccess: (Cat) -> Unit,
+        onError: (String) -> Unit,
+        onStart: () -> Unit,
+        allowErrors: Boolean
     ) {
-        for (i in 1..count) {
+        onStart()
+        if (!allowErrors) {
+            while (true) {
+                val cat: Cat? = getCatFromInternet()
+                if (cat != null) {
+                    onSuccess.invoke(cat)
+                    break
+                }
+            }
+        } else {
             val cat: Cat? = getCatFromInternet()
             if (cat != null) {
-                onNext.invoke(cat)
+                onSuccess.invoke(cat)
             } else {
-                onError()
+                onError("Упс, что-то пошло не так при загрузке котеек.")
             }
         }
-        onComplete()
     }
 
     private fun getCatFromInternet(): Cat? {
-        return when (Random.nextInt(5)) {
-            0 -> null
-            1 -> Cat("Борис")
-            2 -> Cat("Кузьма")
-            3 -> Cat("Барсик")
-            4 -> Cat("Кефирчик")
-            else -> null
-        }
+        return if (Random.nextBoolean()) Cat("Борис") else null
     }
 }
 
-data class Cat(val name: String)
+class Cat(val name: String)
