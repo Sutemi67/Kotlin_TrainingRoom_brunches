@@ -1,26 +1,55 @@
+import kotlin.random.Random
+
 fun main() {
-    data class Student(
-        val name: String, val estimates: List<Int>
-    )
+    val catDownloaderV2 = CatDownloaderV2()
 
-    val students: List<Student> = listOf(
-        Student("Анна", listOf(5, 4, 5, 5, 4)),
-        Student("Алёна", listOf(5, 5, 5, 5, 5)),
-        Student("Кирилл", listOf(3, 4, 5, 3, 4)),
-        Student("Григорий", listOf(3, 3, 4, 3, 4)),
-        Student("Светлана", listOf(5, 5, 5, 5, 4)),
-        Student("Саша", listOf(4, 4, 4, 3, 5)),
-        Student("Степан", listOf(2, 3, 3, 2, 4)),
-        Student("Антон", listOf(2, 2, 3, 3, 3)),
-        Student("Катя", listOf(3, 3, 4, 5, 4)),
-        Student("Стас", listOf(5, 5, 5, 5, 4)),
-    )
-
-    val result = students.filter { student -> student.estimates.average() > 3 }
-        .sortedByDescending { student -> student.estimates.average() }
-        .map { student -> student.name }
-        .take(3)
-
-
-    println(result)
+    // перепишите данную реализацию согласно требованиям в задаче
+    val downloadedCats = catDownloaderV2.downloadCats(CATS_COUNT)
+    //В новой реализации в выводе такого сообщения необходимости не будет
+    println("Котики $downloadedCats показаны")
 }
+
+
+fun showCat(cat: Cat) {
+    println("Котик ${cat.name} успешно загружен")
+}
+
+fun showComplete() {
+    println("Загрузка котиков завершена")
+}
+
+fun showError() {
+    println("Упс. При загрузке котика произошла ошибка :(")
+}
+
+// константа для выбора количества загруженных котиков
+const val CATS_COUNT = 5
+
+
+
+class CatDownloaderV2 {
+
+    // перепишите метод согласно заданию. Используйте функции в качестве параметров для реагирования на события загрузки котиков
+    fun downloadCats(count: Int): List<Cat?> {
+        val catsList = mutableListOf<Cat?>()
+        for (i in 1..count) {
+            catsList.add(getCatFromInternet())
+        }
+
+        return catsList;
+    }
+
+    // этот метод переписывать не нужно. Но если вам хочется добавить разнообразия — вы можете придумать свою логику генерации котиков ¯\_(ツ)_/¯
+    private fun getCatFromInternet(): Cat? {
+        return when (Random.nextInt(5)) {
+            0 -> null
+            1 -> Cat("Борис")
+            2 -> Cat("Кузьма")
+            3 -> Cat("Барсик")
+            4 -> Cat("Кефирчик")
+            else -> null
+        }
+    }
+}
+
+data class Cat(val name: String)
